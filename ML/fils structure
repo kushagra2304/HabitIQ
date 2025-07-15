@@ -1,0 +1,13 @@
+task-ml/
+│
+├── data/
+│   └── tasks.csv
+├── models/
+│   └── task_classifier.pkl
+├── src/
+│   ├── preprocess.py
+│   ├── train_classifier.py
+│   ├── analyze_user_behavior.py
+│   └── predict_weak_categories.py
+├── app.py
+└── requirements.txt

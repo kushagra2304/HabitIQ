@@ -1,0 +1,41 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+.venv/
+
+# Environment files
+.env
+.env/
+
+# Model files
+*.pkl
+*.joblib
+*.h5
+
+# Reports and generated outputs
+reports/
+*.csv
+*.pdf
+*.html
+
+# Notebooks and checkpoints
+.ipynb_checkpoints/
+
+# Cache and logs
+.cache/
+*.log
+
+# Editor settings
+.vscode/
+.idea/
+
+# Ignore all data but keep a template if needed
+data/
+!data/tasks_template.csv
+
+# OS metadata
+.DS_Store
+Thumbs.db
