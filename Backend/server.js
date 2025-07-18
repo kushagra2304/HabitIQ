@@ -232,8 +232,6 @@ app.get("/api/completion-stats/:userId", (req, res) => {
     res.json(data);
   });
 });
-
-
 app.get("/api/lacking-categories/:user_id", (req, res) => {
   const userId = req.params.user_id;
   const days = parseInt(req.query.days) || 30;
