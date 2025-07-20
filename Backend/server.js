@@ -2,6 +2,13 @@ const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql2");
 require("dotenv").config();
+const axios = require("axios");
+// const mlRoutes = require("./mlRoute.js"); // Import the ML routes
+
+// const classifyTask = require("./ML/src/");
+// const predictCompletion = require("../ML/src/future_task_prediction");
+// const analyzeWeakAreas = require("../ML/src/weak_area");
+// const generateReport = require("../ML/src/generate_report");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -263,7 +270,69 @@ app.get("/api/lacking-categories/:user_id", (req, res) => {
   });
 });
 
+// index.js (Express example)
+app.post('/generate_report', async (req, res) => {
+  try {
+    // your report generation logic
+    res.json({ message: 'Report generated successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
+
+
+// === ML Endpoints ===
+
+app.post("/api/ml/classify", async (req, res) => {
+  const { task_text } = req.body;
+  if (!task_text) return res.status(400).json({ error: "Missing task_text" });
+
+  try {
+    const response = await axios.post("http://127.0.0.1:5001/api/ml/classify", { task_text });
+    res.json(response.data);
+  } catch (error) {
+    console.error("Flask classify error:", error.message);
+    res.status(500).json({ error: "Flask classify failed" });
+  }
+});
+
+// 🔗 Route to predict task completion
+app.post("/api/ml/predict", async (req, res) => {
+  const { task_text, label, date } = req.body;
+  if (!task_text || !label || !date) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    const response = await axios.post("http://127.0.0.1:5001/api/ml/predict", {
+      task_text,
+      label,
+      date,
+    });
+    res.json(response.data);
+  } catch (error) {
+    console.error("Flask predict error:", error.message);
+    res.status(500).json({ error: "Flask prediction failed" });
+  }
+});
+
+// 🔗 Route to generate performance report
+app.post("/api/ml/report", async (req, res) => {
+  const { user_id } = req.body;
+  if (!user_id) return res.status(400).json({ error: "Missing user_id" });
+
+  try {
+    const response = await axios.post("http://127.0.0.1:5001/api/ml/generate_report", {
+      user_id,
+    });
+    res.json(response.data);
+  } catch (error) {
+    console.error("Flask report error:", error.message);
+    res.status(500).json({ error: "Flask report generation failed" });
+  }
+});
 
 
 

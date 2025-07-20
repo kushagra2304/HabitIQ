@@ -58,3 +58,20 @@ print(classification_report(y_test, y_pred))
 os.makedirs("models", exist_ok=True)
 joblib.dump(pipeline, "models/completion_predictor.pkl")
 print("✅ Completion predictor model saved to models/completion_predictor.pkl")
+
+
+def predict_completion(task_text, label, date_str):
+    """Predict if a task will be completed or not."""
+    import pandas as pd
+    from datetime import datetime
+
+    model = joblib.load("models/completion_predictor.pkl")
+
+    # Convert to DataFrame
+    df = pd.DataFrame([{
+        "task_text": task_text,
+        "label": label,
+        "date": pd.to_datetime(date_str)
+    }])
+
+    return model.predict(df)[0]

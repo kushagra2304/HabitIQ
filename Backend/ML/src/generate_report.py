@@ -59,3 +59,28 @@ print("\n🔮 Future Task Risk Prediction:\n")
 print(future_tasks[["task_text", "label", "risk_level"]])
 
 print("\n✅ Reports saved to /reports folder.")
+
+def generate_report(labeled_task_file, output_path="reports/final_report.csv"):
+    # Analyze weak areas
+    weak_areas_df = analyze_weak_areas(labeled_task_file)
+
+    # Predict future completion likelihood
+    predictions_df = predict_completion(labeled_task_file)
+
+    # Merge reports
+    report = {
+        "Weak Areas": weak_areas_df.to_dict(orient="records"),
+        "Predicted Task Completion": predictions_df.to_dict(orient="records")
+    }
+
+    # Save as CSV
+    flat_df = pd.DataFrame({
+        "Weak Category": [row["label"] for row in weak_areas_df.itertuples()],
+        "Total Tasks": [row.total_tasks for row in weak_areas_df.itertuples()],
+        "Completion Rate": [row.completion_rate for row in weak_areas_df.itertuples()]
+    })
+
+    flat_df.to_csv(output_path, index=False)
+    print(f"✅ Reports saved to '{output_path}'")
+
+    return report

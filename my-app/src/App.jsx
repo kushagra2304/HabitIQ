@@ -5,6 +5,7 @@ import Progress from "./pages/progress";
 import Navbar from "./components/reused/NavBar"; 
 import Login from "./pages/login"; 
 import Signup from "./pages/signup"; 
+import GenerateReportPage from "./pages/generateReport";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             <Route path="/progress" element={<Progress />} />
             <Route path="/login" element={<Login />} /> 
             <Route path="/signup" element={<Signup />} />
+            <Route path="/generate-report" element={<GenerateReportPage />} />
           </Routes>
         </div>
       </div>

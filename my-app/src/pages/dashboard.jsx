@@ -73,35 +73,64 @@ export default function Dashboard() {
     }
   }, [user]);
 
-const handleAddTask = () => {
+  useEffect(() => {
+  if (user?.id) {
+    axios
+      .post("http://localhost:5000/api/ml/analyze-weak-areas", { user_id: user.id })
+      .then((res) => {
+        console.log("🔍 Weak areas:", res.data.weak_areas);
+        // Optional: Set state to display them on UI
+      })
+      .catch((err) => console.error("Error analyzing weak areas:", err));
+  }
+}, [user]);
+
+
+const handleAddTask = async () => {
   if (!task.trim()) return alert("Task cannot be empty");
   if (!user?.id) return alert("User not logged in");
 
-  const currentDateTime = new Date().toISOString().slice(0, 19).replace("T", " "); // MySQL datetime format
+  const currentDateTime = new Date().toISOString().slice(0, 19).replace("T", " ");
 
-  const newTask = {
-    user_id: user.id,
-    task_text: task,
-    date: currentDateTime,
-    completed: 0,
-    is_saved: 0,
-    label: taskLabel,
-  };
-
-  axios
-    .post("http://localhost:5000/api/add-task", newTask)
-    .then((res) => {
-      setTasks((prev) => [...prev, res.data]);
-      setTask("");
-      setStartTime(null);
-      setEndTime(null);
-      setTaskLabel(taskLabels[0]);
-    })
-    .catch((err) => {
-      console.error("Error adding task:", err);
-      alert("Failed to add task.");
+  try {
+    // Step 1: Classify task
+    const classifyRes = await axios.post("http://localhost:5000/api/ml/classify", {
+      task_text: task,
     });
+    const classifiedLabel = classifyRes.data.label || taskLabel;
+    setTaskLabel(classifiedLabel); // optional UI sync
+
+    // Step 2: Predict if task will be completed
+    const predictRes = await axios.post("http://localhost:5000/api/ml/predict-completion", {
+      task_text: task,
+      date: currentDateTime,
+      label: classifiedLabel,
+    });
+    const willComplete = predictRes.data.will_complete;
+    console.log("⚙️ Predicted completion:", willComplete);
+
+    // Step 3: Save task to DB
+    const newTask = {
+      user_id: user.id,
+      task_text: task,
+      date: currentDateTime,
+      completed: 0,
+      is_saved: 0,
+      label: classifiedLabel,
+    };
+
+    const saveRes = await axios.post("http://localhost:5000/api/add-task", newTask);
+    setTasks((prev) => [...prev, saveRes.data]);
+    setTask("");
+    setStartTime(null);
+    setEndTime(null);
+    setTaskLabel(taskLabels[0]);
+  } catch (err) {
+    console.error("❌ Error in ML-enhanced task add:", err);
+    alert("Failed to add task.");
+  }
 };
+
 
 
   const handleToggle = (id, checked) => {

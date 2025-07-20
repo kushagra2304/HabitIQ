@@ -42,3 +42,21 @@ summary.to_csv("reports/task_summary_report.csv")
 weak_areas.to_csv("reports/weak_areas.csv")
 
 print("\n✅ Reports saved to 'reports/' folder.")
+
+
+def analyze_weak_areas(file_path):
+    """Analyze weak areas from the labeled tasks CSV."""
+    df = pd.read_csv(file_path)
+
+    # Completion rate by label
+    label_stats = df.groupby('label').agg(
+        total_tasks=('label', 'count'),
+        completed=('completed', 'sum')
+    )
+    label_stats['completion_rate'] = label_stats['completed'] / label_stats['total_tasks']
+    
+    # Find low frequency or low completion labels
+    low_performance = label_stats.sort_values(by=['completion_rate', 'total_tasks']).head(3)
+
+    return low_performance.reset_index()
+

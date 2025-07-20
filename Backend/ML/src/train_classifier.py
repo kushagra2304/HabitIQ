@@ -47,3 +47,8 @@ print("Classification Report:\n", classification_report(y_test, y_pred))
 os.makedirs("models", exist_ok=True)
 joblib.dump(pipeline, "models/task_classifier.pkl")
 print("Model saved to models/task_classifier.pkl")
+
+def classify_task(task_text):
+    """Classify a new task string using the trained model."""
+    model = joblib.load("models/task_classifier.pkl")
+    return model.predict([task_text])[0]
